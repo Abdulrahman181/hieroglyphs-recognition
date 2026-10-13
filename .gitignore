@@ -1,4 +1,5 @@
 data/
+artifacts/
 *.h5
 *.keras
 *.pkl
@@ -7,3 +8,5 @@ data/
 __pycache__/
 .ipynb_checkpoints/
 .venv/
+*.egg-info/
+.pytest_cache/

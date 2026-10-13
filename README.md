@@ -1,12 +1,19 @@
 # Egyptian Hieroglyphs Recognition
 
-This repository contains a reproducible machine-learning notebook for **Egyptian Hieroglyphs Recognition**.
+This repository contains a reproducible transfer-learning notebook for **Egyptian hieroglyph classification** from cropped object-detection annotations. The dataset is deliberately not committed because of size and licensing constraints.
 
-## Data
+## Data contract
 
-The dataset is intentionally not committed because of size/licensing constraints. Required input: Dataset with `train/`, `valid/`, `test/` and `_annotations.csv` files.
+Set `HIEROGLYPHS_DATA_DIR` to a dataset root with this layout:
 
-Set the environment variable `HIEROGLYPHS_DATA_DIR` to the local dataset path before running the notebook. The notebook defaults to a `data/` path for local execution.
+```text
+$HIEROGLYPHS_DATA_DIR/
+├── train/_annotations.csv
+├── valid/_annotations.csv
+└── test/_annotations.csv
+```
+
+Each annotation CSV must contain `filename`, `class`, `xmin`, `ymin`, `xmax`, and `ymax`, and every referenced image must exist inside its split directory. The notebook validates the schema and boxes, rejects exact filename overlap between splits as a leakage safeguard, learns the class mapping from **train only**, and reports a clear error when data is absent. No dataset or metric result is claimed in this repository.
 
 ## Run
 
@@ -15,13 +22,15 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 export HIEROGLYPHS_DATA_DIR=/absolute/path/to/data
-jupyter notebook
+python validate_project.py
+jupyter notebook egyptian-hieroglyphs-using-tl-cnn.ipynb
 ```
 
-Run cells from top to bottom. Generated models and caches should remain local and are excluded from version control.
+Run notebook cells from top to bottom. Generated models are written to `artifacts/` by default and are ignored by Git. The default model is `ResNet50` with ImageNet weights; use `HIEROGLYPHS_USE_IMAGENET_WEIGHTS=0` when weight download is unavailable (that run is not comparable to ImageNet transfer learning). Optional controls include `HIEROGLYPHS_SEED`, `HIEROGLYPHS_MODEL`, `HIEROGLYPHS_IMAGE_SIZE`, `HIEROGLYPHS_BATCH_SIZE`, `HIEROGLYPHS_EPOCHS`, and `HIEROGLYPHS_ARTIFACT_DIR`.
 
-## Limitations and cautions
+## Validation and evaluation notes
 
-- Reported metrics depend on the dataset split, random seed, preprocessing, and library versions.
-- These notebooks are educational/research artifacts, not production or medical decision systems.
-- Validate data schema and class balance before training; do not interpret predictions as professional advice.
+- `validate_project.py` performs dependency-free notebook JSON/AST checks and runs Ruff checks when Ruff is installed.
+- Validation data is used during checkpoint selection; test data is loaded and evaluated only after training.
+- Test metrics include accuracy, weighted precision, weighted recall, weighted F1, and loss. They are computed only when the real dataset and ML dependencies are available.
+- Results depend on the dataset split, random seed, preprocessing, TensorFlow version, and hardware. This educational/research artifact is not a production system.
