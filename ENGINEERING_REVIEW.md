@@ -67,3 +67,9 @@ A full notebook execution, model download, training run, and numerical metric re
 ## Local commit
 
 A local-only commit was created after the review. No changes were pushed to GitHub.
+
+## Second Senior Review (2026-10-16)
+
+A second manual pass verified dynamic class mapping, path safety, sparse-label loss, notebook hygiene, and validator behavior. The missing regression-test layer was completed with `tests/test_validate_project.py`, covering validator execution, AST parsing, stale-output protection, and required data/model-contract markers. No dataset or TensorFlow runtime was present, so no training metrics were claimed.
+
+Validation: `python3 validate_project.py`, `pytest -q` (2 passed), `compileall`, and `git diff --check` passed.
